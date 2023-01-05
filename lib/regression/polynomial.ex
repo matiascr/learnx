@@ -10,7 +10,6 @@ defmodule Learnx.PolynomialRegression do
   """
 
   import Learnx.Preprocessing
-  import Learnx.Math
   import Nx
   import Nx.LinAlg
 
@@ -125,7 +124,7 @@ defmodule Learnx.PolynomialRegression do
 
     case bias do
       true ->
-        [tensor([ones_row(n_samples)]), res |> transpose()]
+        [tensor([for(_ <- 1..n_samples, do: 1)]), res |> transpose()]
         |> concatenate()
         |> transpose()
 

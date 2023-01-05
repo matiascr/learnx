@@ -2,7 +2,7 @@ defmodule PolyTest do
   use ExUnit.Case
   doctest Learnx.PolynomialRegression
 
-  import Learnx.Math
+  import Learnx.TestHelper
   import Nx
 
   alias Learnx.PolynomialRegression, as: PolyReg

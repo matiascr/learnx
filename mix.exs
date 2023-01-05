@@ -6,7 +6,7 @@ defmodule Learnx.MixProject do
 
   def project do
     [
-      app: :sphinx,
+      app: :learnx,
       version: @version,
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,

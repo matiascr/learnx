@@ -2,7 +2,7 @@ defmodule LinearTest do
   use ExUnit.Case
   doctest Learnx.LinearRegression
 
-  import Learnx.Math
+  import Learnx.TestHelper
   import Nx
 
   alias Learnx.LinearRegression, as: LinReg

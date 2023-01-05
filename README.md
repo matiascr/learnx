@@ -100,18 +100,18 @@ iex> reg |> Learnx.PolynomialRegression.predict([0,2])
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish) (not yet), the package can be installed
-by adding `sphinx` to your list of dependencies in `mix.exs`:
+by adding `learnx` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:sphinx, "~> 0.1.0"}
+    {:learnx, "~> 0.1.0"}
   ]
 end
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/sphinx>.
+be found at <https://hexdocs.pm/learnx>.
 
 Independently started in 2022 by myself.

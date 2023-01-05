@@ -1,4 +1,4 @@
-defmodule Learnx.Math do
+defmodule Learnx.TestHelper do
   import Nx
 
   def approx(num, _) when is_integer(num), do: num
@@ -15,10 +15,4 @@ defmodule Learnx.Math do
 
   def round(num, _) when is_integer(num), do: num
   def round(num, precision) when is_float(num), do: Float.round(num, precision)
-
-  def ones_row(length, :tensor), do: ones_row(length) |> tensor()
-
-  def ones_row(length) do
-    for(_ <- 1..length, do: 1)
-  end
 end

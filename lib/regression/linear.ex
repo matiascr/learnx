@@ -8,7 +8,7 @@ defmodule Learnx.LinearRegression do
   """
 
   import Learnx.Preprocessing
-  import Learnx.Math
+  # import Learnx.Math
   import Nx
   import Nx.LinAlg
   import Nx.Defn
@@ -168,7 +168,7 @@ defmodule Learnx.LinearRegression do
     {n_samples, _n_features} = shape(x)
 
     [
-      ones_row(n_samples) |> tensor() |> reshape({1, :auto})
+      for(_ <- 1..n_samples, do: 1) |> tensor() |> reshape({1, :auto})
       | x |> transpose() |> to_batched(1) |> Enum.to_list()
     ]
     |> stack()
