@@ -5,7 +5,7 @@ defmodule PolyTest do
   import Learnx.TestHelper
   import Nx
 
-  alias Learnx.PolynomialRegression, as: PolyReg
+  alias Learnx.PolynomialRegression, as: Poly
 
   setup_all do
     x = [-1, 1, 3, 5]
@@ -31,10 +31,9 @@ defmodule PolyTest do
     }
   end
 
-  # Fit transform simple
   describe "transform" do
     test "polynomial regression transform | simple | bias", state do
-      feature_matrix = PolyReg.transform(tensor(state.x_alt), 3, true)
+      feature_matrix = Poly.transform(tensor(state.x_alt), 3, true)
 
       assert feature_matrix ==
                ~M[1  -1   1  -1
@@ -44,7 +43,7 @@ defmodule PolyTest do
     end
 
     test "polynomial regression transform | simple | no bias", state do
-      feature_matrix = PolyReg.transform(tensor(state.x_alt), 3, false)
+      feature_matrix = Poly.transform(tensor(state.x_alt), 3, false)
 
       assert feature_matrix ==
                ~M[-1   1  -1
@@ -56,7 +55,7 @@ defmodule PolyTest do
 
   describe "transform multiple" do
     test "polynomial regression transform | multiple | bias", state do
-      feature_matrix = PolyReg.transform(tensor(state.x_multi), 3, true)
+      feature_matrix = Poly.transform(tensor(state.x_multi), 3, true)
 
       assert feature_matrix ==
                ~M[1   1   1   1   1   1   1   1   1   1
@@ -66,7 +65,7 @@ defmodule PolyTest do
     end
 
     test "polynomial regression transform | multiple | no bias", state do
-      feature_matrix = PolyReg.transform(tensor(state.x_multi), 3, false)
+      feature_matrix = Poly.transform(tensor(state.x_multi), 3, false)
 
       assert feature_matrix ==
                ~M[1   1   1   1   1   1   1   1   1
@@ -77,8 +76,9 @@ defmodule PolyTest do
   end
 
   describe "fit" do
+    # Single
     test "polynomial regression fit | bias", state do
-      reg = PolyReg.fit(state.x, state.y, 3)
+      reg = Poly.fit(state.x, state.y, 3)
       assert reg.n_features == 1
       assert reg.degree == 3
       assert reg.intercept |> approx(4) == 7
@@ -88,11 +88,44 @@ defmodule PolyTest do
     end
 
     test "polynomial regression fit | no bias", state do
-      reg = PolyReg.fit(state.x, state.y, 3, include_bias: false)
+      reg = Poly.fit(state.x, state.y, 3, include_bias: false)
       assert reg.n_features == 1
       assert reg.degree == 3
       assert reg.intercept == nil
-      assert reg.coef |> approx(4) == [-0.55555556, 2.94202899, -0.47342995] |> approx(4)
+
+      assert reg.coef |> approx(4) ==
+               [-0.55555556, 2.94202899, -0.47342995] |> approx(4)
+    end
+
+    test "polynomial regression fit | tensors | bias", state do
+      reg = Poly.fit(tensor(state.x), tensor(state.y), 3)
+      assert reg.n_features == 1
+      assert reg.degree == 3
+      assert reg.intercept |> approx(4) == 7
+
+      assert reg.coef |> approx(4) ==
+               [1.00000000e+00, -1.99840144e-15, 3.33066907e-16] |> approx(4)
+    end
+
+    test "polynomial regression fit | tensors | no bias", state do
+      reg = Poly.fit(tensor(state.x), tensor(state.y), 3, include_bias: false)
+      assert reg.n_features == 1
+      assert reg.degree == 3
+      assert reg.intercept == nil
+
+      assert reg.coef |> approx(4) ==
+               [-0.55555556, 2.94202899, -0.47342995] |> approx(4)
+    end
+
+    # Multiple
+    test "polynomial regression fit | multiple | bias", state do
+      reg = Poly.fit(state.x_multi, state.y, 3)
+      assert reg.n_features == 1
+      assert reg.degree == 3
+      assert reg.intercept |> approx(4) == 7
+
+      assert reg.coef |> approx(4) ==
+               [1.00000000e+00, -1.99840144e-15, 3.33066907e-16] |> approx(4)
     end
   end
 
@@ -101,8 +134,8 @@ defmodule PolyTest do
       obs = 3
 
       pred =
-        PolyReg.fit(state.x, state.y, 3, include_bias: true)
-        |> PolyReg.predict(obs)
+        Poly.fit(state.x, state.y, 3, include_bias: true)
+        |> Poly.predict(obs)
 
       assert pred |> approx(4) == 10
     end
@@ -111,8 +144,8 @@ defmodule PolyTest do
       obs = [-1, 0, 1, 3]
 
       pred =
-        PolyReg.fit(state.x, state.y, 3, include_bias: true)
-        |> PolyReg.predict(obs)
+        Poly.fit(state.x, state.y, 3, include_bias: true)
+        |> Poly.predict(obs)
 
       assert pred |> approx(4) == [6, 7, 8, 10]
     end
@@ -121,8 +154,8 @@ defmodule PolyTest do
       obs = 3
 
       pred =
-        PolyReg.fit(state.x, state.y, 3, include_bias: false)
-        |> PolyReg.predict(obs)
+        Poly.fit(state.x, state.y, 3, include_bias: false)
+        |> Poly.predict(obs)
 
       assert pred |> approx(4) == 12.02898551 |> approx(4)
     end
@@ -131,8 +164,8 @@ defmodule PolyTest do
       obs = [-1, 0, 1, 3]
 
       pred =
-        PolyReg.fit(state.x, state.y, 3, include_bias: false)
-        |> PolyReg.predict(obs)
+        Poly.fit(state.x, state.y, 3, include_bias: false)
+        |> Poly.predict(obs)
 
       assert pred |> approx(4) == [3.97101449, 0, 1.91304348, 12.02898551] |> approx(4)
     end

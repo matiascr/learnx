@@ -5,7 +5,7 @@ defmodule LinearTest do
   import Learnx.TestHelper
   import Nx
 
-  alias Learnx.LinearRegression, as: LinReg
+  alias Learnx.LinearRegression, as: Linear
 
   setup_all do
     x = [-1, 1, 3, 5]
@@ -33,21 +33,21 @@ defmodule LinearTest do
 
   describe "fit" do
     test "linear regression fit | one feature | intercept", state do
-      reg = LinReg.fit(state.x, state.y)
+      reg = Linear.fit(state.x, state.y)
       assert reg.coef |> approx(4) == 1.0
       assert reg.intercept |> approx(4) == 7.0
       assert reg.n_features == 1
     end
 
     test "linear regression fit | multiple features | intercept", state do
-      reg = LinReg.fit(state.x_multi, state.y_alt)
+      reg = Linear.fit(state.x_multi, state.y_alt)
       assert reg.coef |> approx(4) == [1.0, 2.0]
       assert reg.intercept |> approx(4) == 3.0
       assert reg.n_features == 2
     end
 
     test "linear regression fit | multiple features | no intercept", state do
-      reg = LinReg.fit(state.x_multi, state.y_alt, intercept: false)
+      reg = Linear.fit(state.x_multi, state.y_alt, intercept: false)
       assert reg.coef |> approx(4) == [2.0909, 2.5454]
       assert reg.intercept == nil
       assert reg.n_features == 2
@@ -57,48 +57,48 @@ defmodule LinearTest do
   describe "predict" do
     test "linear regression predict | one feature | number", state do
       pred =
-        LinReg.fit(state.x, state.y)
-        |> LinReg.predict(1)
+        Linear.fit(state.x, state.y)
+        |> Linear.predict(1)
 
       assert pred == 8.0
     end
 
     test "linear regression predict | one feature | list", state do
       pred =
-        LinReg.fit(state.x, state.y)
-        |> LinReg.predict([1, 3])
+        Linear.fit(state.x, state.y)
+        |> Linear.predict([1, 3])
 
       assert pred == [8.0, 10.0]
     end
 
     test "linear regression predict | one feature | tensor", state do
       pred =
-        LinReg.fit(state.x, state.y)
-        |> LinReg.predict(tensor([1, 3]))
+        Linear.fit(state.x, state.y)
+        |> Linear.predict(tensor([1, 3]))
 
       assert pred |> approx(4) == [8.0, 10.0]
     end
 
     test "linear regression predict | multiple features | 1 sample", state do
       pred =
-        LinReg.fit(state.x_multi, state.y)
-        |> LinReg.predict([1, 1])
+        Linear.fit(state.x_multi, state.y)
+        |> Linear.predict([1, 1])
 
       assert pred |> approx(4) == [6.0]
     end
 
     test "linear regression predict | multiple features | list of samples", state do
       pred =
-        LinReg.fit(state.x_multi, state.y)
-        |> LinReg.predict([[1, 1], [1, 2], [2, 2]])
+        Linear.fit(state.x_multi, state.y)
+        |> Linear.predict([[1, 1], [1, 2], [2, 2]])
 
       assert pred |> approx(4) == [6.0, 8.0, 10.0]
     end
 
     test "linear regression predict | multiple features | tensor of samples", state do
       pred =
-        LinReg.fit(state.x_multi, state.y)
-        |> LinReg.predict(tensor([[1, 1], [1, 2], [2, 2]]))
+        Linear.fit(state.x_multi, state.y)
+        |> Linear.predict(tensor([[1, 1], [1, 2], [2, 2]]))
         |> to_flat_list()
 
       assert pred |> approx(4) == [6.0, 8.0, 10.0]

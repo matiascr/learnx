@@ -4,7 +4,9 @@ defmodule Learnx.Preprocessing do
   @type tensor :: Nx.Tensor.t()
 
   @doc """
-  Validate input data.
+  Validates input data.
+
+  Adapts the shape of the given data to one the regressors can use.
 
   ## Parameters
     - x : list or tensor of shape (n_samples, n_features) or (n_samples,).
@@ -36,6 +38,13 @@ defmodule Learnx.Preprocessing do
     case axis_size(x, 0) == axis_size(y, 0) do
       true -> {x, y}
       _ -> raise error_message
+    end
+  end
+
+  def validate_data(t) do
+    case shape(t) do
+      {_samples, _features} -> t |> squeeze()
+      _ -> t
     end
   end
 end

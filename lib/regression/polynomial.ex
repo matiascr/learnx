@@ -13,9 +13,11 @@ defmodule Learnx.PolynomialRegression do
   import Nx
   import Nx.LinAlg
 
-  alias __MODULE__, as: PolyReg
+  alias __MODULE__, as: Poly
 
   @typedoc """
+  Polynomial regressor.
+
   - coef : tensor of shape {n_polynomial_features}.
   Estimated coefficients for the linear regression problem. The dimensions
   of the tensor will depend on the number of polynomial features generated
@@ -36,7 +38,7 @@ defmodule Learnx.PolynomialRegression do
   """
   defstruct [:coef, :intercept, :n_features, :degree]
 
-  @type regressor :: %PolyReg{
+  @type regressor :: %Poly{
           coef: tensor,
           intercept: number,
           n_features: number,
@@ -45,7 +47,7 @@ defmodule Learnx.PolynomialRegression do
   @type tensor :: Nx.Tensor.t()
 
   @doc """
-  Fit polynomial model.
+  Fits polynomial model.
 
   ## Parameters
   - x : list or tensor of shape {n_samples, n_features} or {n_samples,}.
@@ -57,6 +59,42 @@ defmodule Learnx.PolynomialRegression do
   ## Returns
   A polynomial regressor containing the coefficients, intercept (if chosen),
   number of features and the degree.
+
+  ## Examples
+  Using lists as inputs, degree 3:
+  ```elixir
+  iex> x = [-1, 1, 3, 5]
+  iex> y = [6, 8, 10, 12]
+  iex> reg = Learnx.PolynomialRegression.fit(x, y, 3)
+  iex> reg.n_features
+  1
+  iex> reg.degree
+  3
+  iex> reg.intercept
+  6.999995231628418
+  iex> reg.coef
+  #Nx.Tensor<
+    f32[3]
+    [0.9999974966049194, 1.0758638381958008e-5, -1.9297003746032715e-6]
+  >
+  ```
+  Using tensors as inputs, degree 2, no bias:
+  ```elixir
+  iex> x = [[1, 1], [1, 2], [2, 2], [2, 3]]
+  iex> y = [6, 8, 10, 12]
+  iex> reg = Learnx.PolynomialRegression.fit(x, y, 3, include_bias: true)
+  iex> reg.n_features
+  1
+  iex> reg.degree
+  2
+  iex> reg.intercept
+  nil
+  iex> reg.coef
+  #Nx.Tensor<
+    f32[2]
+    [1.5637593269348145, 0.23489943146705627]
+  >
+  ```
   """
   @spec fit(list | tensor, list | tensor, non_neg_integer, keyword) :: regressor
   def fit(x, y, degree \\ 2, opts \\ []) do
@@ -73,7 +111,7 @@ defmodule Learnx.PolynomialRegression do
 
     case opts[:include_bias] do
       true ->
-        %PolyReg{
+        %Poly{
           coef: coef[1..(size(coef) - 1)],
           intercept: coef[0] |> to_number(),
           n_features: n_features,
@@ -81,7 +119,7 @@ defmodule Learnx.PolynomialRegression do
         }
 
       false ->
-        %PolyReg{
+        %Poly{
           coef: coef,
           intercept: nil,
           n_features: n_features,
@@ -91,19 +129,22 @@ defmodule Learnx.PolynomialRegression do
   end
 
   @doc """
-  Transforms and returns x. Generates the feature matrix, based on the degree.
+  Transforms and returns x.
+
+  Generates the feature matrix from the matrix, the result is based on the
+  degree.
 
   ## Parameters
   - x : tensor of shape {n_samples, n_features}.
-    Samples.
+  Samples.
 
   - degree : non-negative integer.
-    Degree of the transformed matrix to return.
+  Degree of the transformed matrix to return.
 
   - include_bias : boolean, default=true.
-    If `true`, then include a bias column, the feature in which all
-    polynomial powers are zero (i.e. a column of ones - acts as an intercept
-    term in a linear model).
+  If `true`, then include a bias column, the feature in which all
+  polynomial powers are zero (i.e. a column of ones - acts as an intercept
+  term in a linear model).
 
   ## Returns
   Transformed version of x.
@@ -165,7 +206,7 @@ defmodule Learnx.PolynomialRegression do
   end
 
   @doc """
-  Predict using the polynomial model.
+  Predicts using the polynomial model.
 
   ## Parameters
   - regressor : trained regressor to use for the predictions.
@@ -184,7 +225,7 @@ defmodule Learnx.PolynomialRegression do
     Enum.map(x, &predict(regressor, &1))
   end
 
-  def predict(%PolyReg{coef: coef, intercept: nil, degree: degree}, x) do
+  def predict(%Poly{coef: coef, intercept: nil, degree: degree}, x) do
     1..degree
     |> Enum.map(fn d -> x |> power(d) end)
     |> stack()
@@ -193,7 +234,7 @@ defmodule Learnx.PolynomialRegression do
     |> to_number()
   end
 
-  def predict(regressor = %PolyReg{intercept: intercept}, x) do
+  def predict(regressor = %Poly{intercept: intercept}, x) do
     intercept + predict(%{regressor | intercept: nil}, x)
   end
 end

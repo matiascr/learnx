@@ -8,14 +8,15 @@ defmodule Learnx.LinearRegression do
   """
 
   import Learnx.Preprocessing
-  # import Learnx.Math
   import Nx
   import Nx.LinAlg
   import Nx.Defn
 
-  alias __MODULE__, as: LinReg
+  alias __MODULE__, as: Linear
 
   @typedoc """
+  Linear regressor.
+
   - coef : tensor of shape {n_features, }.
   Estimated coefficients for the linear regression problem.
 
@@ -27,7 +28,7 @@ defmodule Learnx.LinearRegression do
   """
   defstruct [:coef, :intercept, :n_features]
 
-  @type regressor :: %LinReg{
+  @type regressor :: %Linear{
           coef: tensor,
           intercept: number,
           n_features: number
@@ -35,7 +36,7 @@ defmodule Learnx.LinearRegression do
   @type tensor :: Nx.Tensor.t()
 
   @doc """
-  Fit linear model.
+  Fits linear model.
 
   ## Parameters
   - x : list or tensor of shape {n_samples, n_features} or {n_samples,}.
@@ -53,8 +54,8 @@ defmodule Learnx.LinearRegression do
   number of features.
 
   ## Examples
-  ```
-  # With lists
+  With lists as inputs:
+  ```elixir
   iex> x = [-1, 1, 3, 5]
   iex> y = [6, 8, 10, 12]
   iex> reg = Learnx.LinearRegression.fit(x, y)
@@ -67,8 +68,10 @@ defmodule Learnx.LinearRegression do
   7.0
   iex> reg.n_features
   1
+  ```
 
-  # With tensors
+  With tensors:
+  ```elixir
   iex> x = Nx.tensor([-1, 1, 3, 5])
   iex> y = Nx.tensor([6, 8, 10, 12])
   iex> reg = Learnx.LinearRegression.fit(x, y)
@@ -81,8 +84,10 @@ defmodule Learnx.LinearRegression do
   7.0
   iex> reg.n_features
   1
+  ```
 
-  # Multiple features
+  With multiple features as the input:
+  ```elixir
   iex> x = [[1, 1], [1, 2], [2, 2], [2, 3]]
   iex> y = [6, 8, 9, 11]
   iex> reg = Learnx.LinearRegression.fit(x, y)
@@ -114,7 +119,7 @@ defmodule Learnx.LinearRegression do
       {true, _} ->
         coef = solve_simple(x, y)
 
-        %LinReg{
+        %Linear{
           coef: coef[1],
           intercept: coef[0] |> to_number(),
           n_features: n_features
@@ -123,7 +128,7 @@ defmodule Learnx.LinearRegression do
       {false, true} ->
         coef = solve_multiple(x, y, true)
 
-        %LinReg{
+        %Linear{
           coef: coef[1..n_features],
           intercept: coef[0] |> to_number(),
           n_features: n_features
@@ -132,7 +137,7 @@ defmodule Learnx.LinearRegression do
       {false, false} ->
         coef = solve_multiple(x, y, false)
 
-        %LinReg{
+        %Linear{
           coef: coef,
           n_features: n_features,
           intercept: nil
@@ -178,7 +183,7 @@ defmodule Learnx.LinearRegression do
   end
 
   @doc """
-  Predict using the linear model.
+  Predicts using the linear model.
 
   ## Parameters
   - regressor : trained regressor to use for the predictions.
@@ -192,6 +197,8 @@ defmodule Learnx.LinearRegression do
   it returns a number.
 
   ## Examples
+  Single feature regression:
+  ```elixir
   iex> x = [-1, 1, 3, 5]
   iex> y = [6, 8, 10, 12]
   iex> reg = Learnx.LinearRegression.fit(x, y)
@@ -199,28 +206,32 @@ defmodule Learnx.LinearRegression do
   9.0
   iex> reg |> Learnx.LinearRegression.predict([4, 6])
   [11.0, 13.0]
+  ```
 
+  Multiple features regression:
+  ```elixir
   iex> x = [[1, 1], [1, 2], [2, 2], [2, 3]]
   iex> y = [6, 8, 10, 12]
   iex> reg = Learnx.LinearRegression.fit(x, y)
   iex> reg |> Learnx.LinearRegression.predict([3, 3])
   [13.999992370605469]
+  ```
   """
   @spec predict(regressor, number | list | tensor) :: number | list | tensor
-  def predict(regressor = %LinReg{n_features: 1}, x) when is_number(x),
+  def predict(regressor = %Linear{n_features: 1}, x) when is_number(x),
     do: predict(regressor, tensor(x)) |> to_number()
 
-  def predict(regressor = %LinReg{n_features: 1}, x) when is_list(x),
+  def predict(regressor = %Linear{n_features: 1}, x) when is_list(x),
     do: predict(regressor, tensor(x)) |> to_flat_list()
 
-  def predict(%LinReg{coef: coef, intercept: intercept, n_features: 1}, x) do
+  def predict(%Linear{coef: coef, intercept: intercept, n_features: 1}, x) do
     x |> multiply(coef) |> add(intercept)
   end
 
-  def predict(regressor = %LinReg{n_features: n}, x) when is_list(x),
+  def predict(regressor = %Linear{n_features: n}, x) when is_list(x),
     do: predict(regressor, tensor(x) |> reshape({:auto, n})) |> to_flat_list()
 
-  def predict(%LinReg{coef: coef, intercept: intercept}, x) do
+  def predict(%Linear{coef: coef, intercept: intercept}, x) do
     x
     |> multiply(coef)
     |> sum(axes: [1])

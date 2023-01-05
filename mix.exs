@@ -13,7 +13,8 @@ defmodule Learnx.MixProject do
       name: "Learnx",
       description: description(),
       package: package(),
-      deps: deps()
+      deps: deps(),
+      docs: docs()
     ]
   end
 
@@ -41,6 +42,18 @@ defmodule Learnx.MixProject do
       {:ex_doc, ">= 0.29.0", only: :dev, runtime: false},
       {:nx, "~> 0.2"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "Learnx",
+      groups_for_modules: [
+        Regression: [
+          Learnx.LinearRegression,
+          Learnx.PolynomialRegression
+        ]
+      ]
     ]
   end
 end
