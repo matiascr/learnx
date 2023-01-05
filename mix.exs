@@ -30,7 +30,7 @@ defmodule Learnx.MixProject do
   defp package do
     [
       maintainers: ["Matias Carlander-Reuterfelt"],
-      files: ~w(lib .formatter.exs mix.exs README* LICENSE* CHANGELOG* src),
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE* ),
       licenses: ["Apache-2.0"],
       links: %{"GitHub" => @source_url}
     ]
@@ -38,7 +38,8 @@ defmodule Learnx.MixProject do
 
   defp deps do
     [
-      {:nx, "~> 0.2"}
+      {:ex_doc, ">= 0.29.0", only: :dev, runtime: false},
+      {:nx, "~> 0.2"},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
     ]
   end
