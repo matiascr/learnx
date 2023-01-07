@@ -1,4 +1,4 @@
-defmodule Learnx.TestHelper do
+defmodule Learnx.Helper do
   import Nx
 
   def approx(num, _) when is_integer(num), do: num
@@ -15,4 +15,16 @@ defmodule Learnx.TestHelper do
 
   def round(num, _) when is_integer(num), do: num
   def round(num, precision) when is_float(num), do: Float.round(num, precision)
+
+  @spec sparse?(Nx.Tensor.t()) :: boolean
+  def sparse?(t) do
+    n_zeros =
+      Nx.equal(0, t)
+      |> Nx.sum()
+      |> Nx.to_number()
+
+    n_total = shape(t) |> Tuple.product()
+
+    n_zeros > n_total - n_zeros
+  end
 end
