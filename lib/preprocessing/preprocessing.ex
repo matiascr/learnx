@@ -23,13 +23,15 @@ defmodule Learnx.Preprocessing do
     x =
       case shape(x) do
         {_samples, _features} -> x
-        _ -> x |> reshape({:auto, 1})
+        {_} -> x |> reshape({:auto, 1})
+        _ -> raise "invalid shape of input x"
       end
 
     y =
       case shape(y) do
         {_samples, _features} -> y |> squeeze()
-        _ -> y
+        {_} -> y
+        _ -> raise "invalid shape of input y"
       end
 
     error_message =
