@@ -129,7 +129,7 @@ defmodule Learnx.LinearRegression do
         coef = solve_multiple(x, y, true)
 
         %Linear{
-          coef: coef[1..n_features],
+          coef: coef[1..-1//1],
           intercept: coef[0] |> to_number(),
           n_features: n_features
         }
@@ -173,7 +173,7 @@ defmodule Learnx.LinearRegression do
     {n_samples, _n_features} = shape(x)
 
     [
-      for(_ <- 1..n_samples, do: 1) |> tensor() |> reshape({1, :auto})
+      broadcast(1, {1, n_samples})
       | x |> transpose() |> to_batched(1) |> Enum.to_list()
     ]
     |> stack()

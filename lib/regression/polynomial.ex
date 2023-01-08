@@ -78,26 +78,28 @@ defmodule Learnx.PolynomialRegression do
     [0.9999974966049194, 1.0758638381958008e-5, -1.9297003746032715e-6]
   >
   ```
-  Using tensors as inputs, degree 2, no bias:
-  ```elixir
-  iex> x = [[1, 1], [1, 2], [2, 2], [2, 3]]
-  iex> y = [6, 8, 10, 12]
-  iex> reg = Learnx.PolynomialRegression.fit(x, y, 3, include_bias: true)
-  iex> reg.n_features
-  1
-  iex> reg.degree
-  2
-  iex> reg.intercept
-  nil
-  iex> reg.coef
-  #Nx.Tensor<
-    f32[2]
-    [1.5637593269348145, 0.23489943146705627]
-  >
-  ```
+  # Using tensors as inputs, degree 2, no bias:
+  # ```elixir
+  # iex> x = [[1, 1], [1, 2], [2, 2], [2, 3]]
+  # iex> y = [6, 8, 10, 12]
+  # iex> reg = Learnx.PolynomialRegression.fit(x, y, 3, include_bias: true)
+  # iex> reg.n_features
+  # 1
+  # iex> reg.degree
+  # 2
+  # iex> reg.intercept
+  # nil
+  # iex> reg.coef
+  # #Nx.Tensor<
+  #   f32[2]
+  #   [1.5637593269348145, 0.23489943146705627]
+  # >
+  # ```
   """
   @spec fit(list | tensor, list | tensor, non_neg_integer, keyword) :: regressor
-  def fit(x, y, degree \\ 2, opts \\ []) do
+  def fit(x, y, degree \\ 2, opts \\ [])
+
+  def fit(x, y, degree, opts) do
     default = [include_bias: true]
     opts = Keyword.merge(default, opts)
 
@@ -112,7 +114,7 @@ defmodule Learnx.PolynomialRegression do
     case opts[:include_bias] do
       true ->
         %Poly{
-          coef: coef[1..(size(coef) - 1)],
+          coef: coef[1..-1//1],
           intercept: coef[0] |> to_number(),
           n_features: n_features,
           degree: degree
@@ -165,7 +167,10 @@ defmodule Learnx.PolynomialRegression do
 
     case bias do
       true ->
-        [tensor([for(_ <- 1..n_samples, do: 1)]), res |> transpose()]
+        [
+          broadcast(1, {1, n_samples}),
+          res |> transpose()
+        ]
         |> concatenate()
         |> transpose()
 
@@ -197,6 +202,12 @@ defmodule Learnx.PolynomialRegression do
 
   @spec compute_coefs(tensor, tensor) :: tensor
   defp compute_coefs(dm, y) do
+    m = axis_size(dm, 1)
+    n = axis_size(y, 0)
+
+    if m > n,
+      do: raise("This data cannot be computed. Try adding more samples. {m: #{m} > n: #{n}}")
+
     dm
     |> transpose()
     |> dot(dm)
