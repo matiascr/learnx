@@ -1,4 +1,4 @@
-defmodule LearnxTest do
+defmodule HelperTest do
   use ExUnit.Case
   doctest Learnx.Helper
 

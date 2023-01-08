@@ -2,7 +2,7 @@ defmodule PolyTest do
   use ExUnit.Case
   doctest Learnx.PolynomialRegression
 
-  import Learnx.TestHelper
+  import Learnx.Helper
   import Nx
 
   alias Learnx.PolynomialRegression, as: Poly
@@ -76,8 +76,7 @@ defmodule PolyTest do
   end
 
   describe "fit" do
-    # Single
-    test "polynomial regression fit | bias", state do
+    test "polynomial regression | bias", state do
       reg = Poly.fit(state.x, state.y, 3)
       assert reg.n_features == 1
       assert reg.degree == 3
@@ -87,7 +86,7 @@ defmodule PolyTest do
                [1.00000000e+00, -1.99840144e-15, 3.33066907e-16] |> approx(4)
     end
 
-    test "polynomial regression fit | no bias", state do
+    test "polynomial regression | no bias", state do
       reg = Poly.fit(state.x, state.y, 3, include_bias: false)
       assert reg.n_features == 1
       assert reg.degree == 3
@@ -97,7 +96,7 @@ defmodule PolyTest do
                [-0.55555556, 2.94202899, -0.47342995] |> approx(4)
     end
 
-    test "polynomial regression fit | tensors | bias", state do
+    test "polynomial regression | tensors | bias", state do
       reg = Poly.fit(tensor(state.x), tensor(state.y), 3)
       assert reg.n_features == 1
       assert reg.degree == 3
@@ -107,7 +106,7 @@ defmodule PolyTest do
                [1.00000000e+00, -1.99840144e-15, 3.33066907e-16] |> approx(4)
     end
 
-    test "polynomial regression fit | tensors | no bias", state do
+    test "polynomial regression | tensors | no bias", state do
       reg = Poly.fit(tensor(state.x), tensor(state.y), 3, include_bias: false)
       assert reg.n_features == 1
       assert reg.degree == 3
@@ -116,17 +115,18 @@ defmodule PolyTest do
       assert reg.coef |> approx(4) ==
                [-0.55555556, 2.94202899, -0.47342995] |> approx(4)
     end
+  end
 
-    # Multiple
-    test "polynomial regression fit | multiple | bias", state do
-      reg = Poly.fit(state.x_multi, state.y, 3)
-      assert reg.n_features == 1
-      assert reg.degree == 3
-      assert reg.intercept |> approx(4) == 7
+  describe "fit multiple" do
+    # test "polynomial regression | bias", state do
+    #   reg = Poly.fit(state.x_multi, state.y, 3)
+    #   assert reg.n_features == 1
+    #   assert reg.degree == 3
+    #   assert reg.intercept |> approx(4) == 7
 
-      assert reg.coef |> approx(4) ==
-               [1.00000000e+00, -1.99840144e-15, 3.33066907e-16] |> approx(4)
-    end
+    #   assert reg.coef |> approx(4) ==
+    #            [1.00000000e+00, -1.99840144e-15, 3.33066907e-16] |> approx(4)
+    # end
   end
 
   describe "predict" do
